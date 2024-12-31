@@ -62,24 +62,60 @@
         </div>
     </section>
 
+    <!-- Schedule Section -->
+    <section id="schedule" class="bg-white py-20">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-10">Schedule</h3>
+            <ul class="space-y-4">
+                <li class="text-lg">Weekends: 12 PM, 2 PM, 4 PM</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Packages Section -->
+    <section id="packages" class="bg-gray-200 py-20">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-10">Packages</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white shadow-md rounded-md p-4">
+                    <h4 class="font-bold text-xl">Couple Package</h4>
+                    <p class="text-gray-600">30 minutes, 30 edited images. Starting at $40.</p>
+                </div>
+                <div class="bg-white shadow-md rounded-md p-4">
+                    <h4 class="font-bold text-xl">Family Package</h4>
+                    <p class="text-gray-600">1 hour, 80 images. Starting at $80.</p>
+                </div>
+                <div class="bg-white shadow-md rounded-md p-4">
+                    <h4 class="font-bold text-xl">Bridal Shower Package</h4>
+                    <p class="text-gray-600">2 hours, unlimited images. Starting at $120.</p>
+                </div>
+                <div class="bg-white shadow-md rounded-md p-4">
+                    <h4 class="font-bold text-xl">Pre-Wedding Package</h4>
+                    <p class="text-gray-600">2 hours, 80 images. Starting at $100.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact Section -->
     <section id="contact" class="bg-gray-200 py-20">
         <div class="container mx-auto px-4">
             <h3 class="text-3xl font-bold text-center mb-10">Contact Us</h3>
-            <form action="#" method="POST" class="max-w-lg mx-auto bg-white shadow-md rounded-md p-6">
+            <form id="contactForm" class="max-w-lg mx-auto bg-white shadow-md rounded-md p-6">
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
-                    <input type="text" id="name" name="name" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
+                    <input type="text" id="name" name="name" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" required>
                 </div>
                 <div class="mb-4">
                     <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
-                    <input type="email" id="email" name="email" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
+                    <input type="email" id="email" name="email" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" required>
                 </div>
                 <div class="mb-4">
                     <label for="message" class="block text-gray-700 font-bold mb-2">Message</label>
-                    <textarea id="message" name="message" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200"></textarea>
+                    <textarea id="message" name="message" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" required></textarea>
                 </div>
                 <button type="submit" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600">Send Message</button>
+                <p id="formResponse" class="text-center mt-4"></p>
             </form>
         </div>
     </section>
@@ -90,5 +126,40 @@
             <p>&copy; 2024 Pixel Rhymes. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- JavaScript for Form Submission -->
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Gather form data
+            const formData = new FormData(this);
+            const data = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                message: formData.get('message')
+            };
+
+            // Send the form data using Fetch API
+            fetch('send-email.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('formResponse').innerText = 'Thank you! Your message has been sent successfully.';
+                } else {
+                    document.getElementById('formResponse').innerText = 'Sorry, something went wrong. Please try again.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('formResponse').innerText = 'Sorry, something went wrong. Please try again.';
+            });
+        });
+    </script>
 </body>
 </html>
