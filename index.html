@@ -101,21 +101,20 @@
     <section id="contact" class="bg-gray-200 py-20">
         <div class="container mx-auto px-4">
             <h3 class="text-3xl font-bold text-center mb-10">Contact Us</h3>
-            <form id="contactForm" class="max-w-lg mx-auto bg-white shadow-md rounded-md p-6">
+            <form action="send-email.php" method="POST" class="max-w-lg mx-auto bg-white shadow-md rounded-md p-6">
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
-                    <input type="text" id="name" name="name" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" required>
+                    <input type="text" id="name" name="name" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
                 </div>
                 <div class="mb-4">
                     <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
-                    <input type="email" id="email" name="email" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" required>
+                    <input type="email" id="email" name="email" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
                 </div>
                 <div class="mb-4">
                     <label for="message" class="block text-gray-700 font-bold mb-2">Message</label>
-                    <textarea id="message" name="message" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" required></textarea>
+                    <textarea id="message" name="message" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200"></textarea>
                 </div>
                 <button type="submit" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600">Send Message</button>
-                <p id="formResponse" class="text-center mt-4"></p>
             </form>
         </div>
     </section>
@@ -127,39 +126,40 @@
         </div>
     </footer>
 
-    <!-- JavaScript for Form Submission -->
-    <script>
-        document.getElementById('contactForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+    <!-- PHP Script for Form Submission -->
+    <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $name = trim($_POST['name']);
+        $email = trim($_POST['email']);
+        $message = trim($_POST['message']);
 
-            // Gather form data
-            const formData = new FormData(this);
-            const data = {
-                name: formData.get('name'),
-                email: formData.get('email'),
-                message: formData.get('message')
-            };
+        // Validate form data
+        if (empty($name) || empty($email) || empty($message)) {
+            http_response_code(400); // Bad request
+            echo json_encode(["error" => "All fields are required."]);
+            exit;
+        }
 
-            // Send the form data using Fetch API
-            fetch('send-email.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (response.ok) {
-                    document.getElementById('formResponse').innerText = 'Thank you! Your message has been sent successfully.';
-                } else {
-                    document.getElementById('formResponse').innerText = 'Sorry, something went wrong. Please try again.';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('formResponse').innerText = 'Sorry, something went wrong. Please try again.';
-            });
-        });
-    </script>
+        // Email validation
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            http_response_code(400);
+            echo json_encode(["error" => "Invalid email format."]);
+            exit;
+        }
+
+        $to = "hridoybiswas89@yahoo.com"; // Replace with your actual email
+        $subject = "New Contact Form Submission";
+        $body = "Name: $name\nEmail: $email\nMessage: $message";
+        $headers = "From: $email";
+
+        if (mail($to, $subject, $body, $headers)) {
+            http_response_code(200); // Success
+            echo json_encode(["success" => "Thank you! Your message has been sent."]);
+        } else {
+            http_response_code(500); // Internal Server Error
+            echo json_encode(["error" => "Failed to send the message. Please try again."]);
+        }
+    }
+    ?>
 </body>
 </html>
